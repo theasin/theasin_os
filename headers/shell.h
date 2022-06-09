@@ -12,6 +12,7 @@ extern "C"
     extern bool ctrl, alt, super, shift, caps;
     extern int read_cmos_seconds(void);
     extern int read_key(int* c);
+    //extern void aint();
     extern char kbd_us[];
     void prompt()  
     {
@@ -22,6 +23,7 @@ extern "C"
         {
             if(sc != inl(0x60))
             {
+                if(getKb(sc) == 'f') { asm("int $0x16"); } 
                 term_putc(getKb(sc), 0x07);
                 update_cursor(term_col, term_row);
                 sc = inl(0x60);

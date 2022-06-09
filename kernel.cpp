@@ -43,6 +43,14 @@ extern "C" void kernel_main(void)
         term_print(" ", 0x07);
     }
     term_print("\n", 0x0f);
+    setAH(0);
+    for(int i = 0; i < VGA_COLS; i++)
+    {
+        for(int j = 0; j < VGA_ROWS; j++)
+        {
+            term_putc(i, j);
+        }
+    }
     prompt();
 }
 

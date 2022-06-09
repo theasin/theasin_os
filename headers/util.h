@@ -1,4 +1,6 @@
 #pragma once
+#ifndef UTIL_H
+#define UTIL_H
 extern "C" {
 static inline unsigned short ins(unsigned short _port) {
 	unsigned short rv;
@@ -34,14 +36,28 @@ static inline void insm(unsigned short port, unsigned char * data, unsigned long
 	asm volatile ("rep insw" : "+D" (data), "+c" (size) : "d" (port) : "memory");
 }
 
+extern void setAL(unsigned char);
+extern void setAH(unsigned char);
+extern void setAX(unsigned short);
+extern void setBL(unsigned char);
+extern void setBH(unsigned char);
+extern void setBX(unsigned short);
+extern void setCL(unsigned char);
+extern void setCH(unsigned char);
+extern void setCX(unsigned short);
+extern void setDL(unsigned char);
+extern void setDH(unsigned char);
+extern void setDX(unsigned short);
+
 /* void * memcpy(void * restrict dest, const void * restrict src, long n); */
-void * memset(void * dest, int c, long n);
-int strcmp(const char * l, const char * r);
-char * strchr(const char * s, int c);
-char * strcat(char *dest, const char *src);
-void copy_sectors(unsigned long lba, unsigned char * buf, int sectors);
-void copy_sector(unsigned long lba, unsigned char * buf);
-unsigned long strlen(const char *s);
+extern void * memset(void * dest, int c, long n);
+extern int strcmp(const char * l, const char * r);
+extern char * strchr(const char * s, int c);
+extern char * strcat(char *dest, const char *src);
+extern void copy_sectors(unsigned long lba, unsigned char * buf, int sectors);
+extern void copy_sector(unsigned long lba, unsigned char * buf);
+extern unsigned long strlen(const char *s);
 
 #define DATA_LOAD_BASE 0x4000000
 }
+#endif
