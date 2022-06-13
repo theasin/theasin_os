@@ -1,5 +1,6 @@
 #include "./headers/types.h"
 #include "./headers/util.h"
+#include "./headers/display.h"
 #define PIC1 0x20
 #define PIC2 0xa0
 #define ICW1 0x11
@@ -78,5 +79,81 @@ extern "C"
 
 		/* disable all IRQs */
 		outb(PIC1 + 1, 0xFF);
+	}
+	u16 ax()
+	{
+		u16 result;
+		asm("movw %%ax,%0" : "=a"(result));
+		return result;
+	}
+	u16 bx()
+	{
+		u16 result;
+		asm("movw %%bx,%0" : "=a"(result));
+		return result;
+	}
+	u16 cx()
+	{
+		u16 result;
+		asm("movw %%cx,%0" : "=a"(result));
+		return result;
+	}
+	u16 dx()
+	{
+		u16 result;
+		asm("movw %%dx,%0" : "=a"(result));
+		return result;
+	}
+	u16 si()
+	{
+		u16 result;
+		asm("movw %%si,%0" : "=a"(result));
+		return result;
+	}
+	u16 bp()
+	{
+		u16 result;
+		asm("movw %%bp,%0" : "=a"(result));
+		return result;
+	}
+	u16 sp()
+	{
+		u16 result;
+		asm("movw %%sp,%0" : "=a"(result));
+		return result;
+	}
+	
+	u16 di()
+	{
+		u16 result;
+		asm("movw %%di,%0" : "=a"(result));
+		return result;
+	}
+ 	void halt(u16 code, char* message)
+ 	{
+ 		term_putc('\n', 0x07);
+ 		term_print("System halted! Code: ", 0x3f);
+ 		term_printnum(code, 0x3f);
+ 		term_print(" (", 0x3f);
+ 		term_print(message, 0x3f);
+ 		term_print(")\n", 0x3f);
+		term_print("ax: ", 0x3f);
+		term_printnum(ax(), 0x3f);
+		term_print("; bx: ", 0x3f);
+		term_printnum(bx(), 0x3f);
+		term_print("; cx: ", 0x3f);
+		term_printnum(cx(), 0x3f);
+		term_print("; dx: ", 0x3f);
+		term_printnum(dx(), 0x3f);
+		term_print("; si: ", 0x3f);
+		term_printnum(si(), 0x3f);
+		term_print("; bp: ", 0x3f);
+		term_printnum(bp(), 0x3f);
+		term_print(" sp: ", 0x3f);
+		term_printnum(sp(), 0x3f);
+		term_print("; di: ", 0x3f);
+		term_printnum(di(), 0x3f);
+		
+ 		__asm__("hlt");
 	}
 }

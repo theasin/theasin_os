@@ -4,6 +4,7 @@
 #pragma once
 #include "types.h"
 #include "display.h"
+#include "util.h"
 #include <stdbool.h>
 #ifndef KBMAP_H
 #define KBMAP_H
@@ -277,13 +278,12 @@ extern "C"
                 term_row++;
                 return '\v';
                 break;
-            case 0x3b3b3b3b:
-                insanity = !insanity;
-                return '\v';
-                break;
             case 0x3c3c3c3c:
                 return '\v';
                 break;
+            case 0x58585858:
+                setDX(0xffff);
+                halt(0xffff, "User-initiated halt");
             default:
             /*
                 char* buffer;

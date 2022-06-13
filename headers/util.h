@@ -48,7 +48,7 @@ extern void setCX(unsigned short);
 extern void setDL(unsigned char);
 extern void setDH(unsigned char);
 extern void setDX(unsigned short);
-
+extern void halt(uint16_t, char*);
 /* void * memcpy(void * restrict dest, const void * restrict src, long n); */
 extern void * memset(void * dest, int c, long n);
 extern int strcmp(const char * l, const char * r);
@@ -57,6 +57,15 @@ extern char * strcat(char *dest, const char *src);
 extern void copy_sectors(unsigned long lba, unsigned char * buf, int sectors);
 extern void copy_sector(unsigned long lba, unsigned char * buf);
 extern unsigned long strlen(const char *s);
+
+extern u16 ax();
+extern u16 bx();
+extern u16 cx();
+extern u16 dx();
+extern u16 si();
+extern u16 bp();
+extern u16 sp();
+extern u16 di();
 
 #define DATA_LOAD_BASE 0x4000000
 }

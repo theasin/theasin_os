@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include "./headers/types.h"
 #include "./headers/kbmap.h"
 #include "./headers/display.h"
@@ -29,8 +30,8 @@ class BuildInfo {
 extern "C" void kernel_main(void)
 {
     BuildInfo binfo;
-    binfo.name = "GensoOS";
-    binfo.version = "prealpha-post-refactor";
+    binfo.name = "THOS";
+    binfo.version = "prealpha-halt";
     term_init();
     term_print("This is ", 0x07);
     term_print(binfo.name, 0x0f);
@@ -38,19 +39,12 @@ extern "C" void kernel_main(void)
     term_print(binfo.version, 0x0f);
     term_print("\n", 0x0f);
     enable_cursor(13, 16);
-    for(uint8_t a = 0x01; a<=0x0f; a = a + 0x01){
-        term_print("@", a);
-        term_print(" ", 0x07);
+    for(uint8_t a = 0x00; a<=0x0f; a = a + 0x01){
+        term_puti(0xdb, a);
+        term_puti(0xdb, a);
+        if(a == 0x07) { term_putc('\n', 0x07); }
     }
-    term_print("\n", 0x0f);
-    setAH(0);
-    for(int i = 0; i < VGA_COLS; i++)
-    {
-        for(int j = 0; j < VGA_ROWS; j++)
-        {
-            term_putc(i, j);
-        }
-    }
+    term_print("\n", 0x07);
     prompt();
 }
 

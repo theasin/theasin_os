@@ -17,13 +17,11 @@ extern "C"
     void prompt()  
     {
         isPrompt == true;
-        term_print("\n[DEPRECATED!] At the moment, old KBMap is being used. Sorry!\n", 0x0e);
         u32 sc = 0x00;
         while(isPrompt)
         {
             if(sc != inl(0x60))
             {
-                if(getKb(sc) == 'f') { asm("int $0x16"); } 
                 term_putc(getKb(sc), 0x07);
                 update_cursor(term_col, term_row);
                 sc = inl(0x60);
