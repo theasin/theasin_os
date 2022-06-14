@@ -33,6 +33,7 @@ extern "C" void kernel_main(void)
     binfo.name = "THOS";
     binfo.version = "prealpha-halt";
     term_init();
+    enterMode13h();
     term_print("This is ", 0x07);
     term_print(binfo.name, 0x0f);
     term_print(" version ", 0x07);
@@ -45,6 +46,9 @@ extern "C" void kernel_main(void)
         if(a == 0x07) { term_putc('\n', 0x07); }
     }
     term_print("\n", 0x07);
+    enterMode13h();
+    // font512();
+    draw_x();
     prompt();
 }
 

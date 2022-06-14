@@ -3,7 +3,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 extern "C" {
-    extern u8 term_col, term_row;
+    extern u8 term_col, term_row, currcol;
     extern bool rtlo, insanity;
     extern str tochar(u64, str);
     extern void term_init();
@@ -14,5 +14,6 @@ extern "C" {
     extern void term_printnum(int, u8);
     extern void enable_cursor(u8, u8);
     extern void update_cursor(int, int);
-}
+    extern void font512(void), draw_x(void), enterMode13h(void);
+    }
 #endif
