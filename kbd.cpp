@@ -1,6 +1,6 @@
-#include "./headers/types.h"
-#include "./headers/kbd.h"
-#include "./headers/util.h"
+#include "headers/types.h"
+#include "headers/kbd.h"
+#include "headers/util.h"
 extern "C" 
 {
 	char kbd_us[128] = {

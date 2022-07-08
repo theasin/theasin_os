@@ -2,12 +2,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
-#include "./headers/types.h"
-#include "./headers/kbmap.h"
-#include "./headers/display.h"
-#include "./headers/asm.h"
-#include "./headers/math.h"
-#include "./headers/shell.h"
+#include "headers/types.h"
+#include "headers/kbmap.h"
+#include "headers/display.h"
+#include "headers/asm.h"
+#include "headers/math.h"
+#include "headers/shell.h"
 
 #define INT_DISABLE 0
 #define INT_ENABLE 0x200
@@ -33,7 +33,8 @@ extern "C" void kernel_main(void)
     binfo.name = "THOS";
     binfo.version = "prealpha-halt";
     term_init();
-    enterMode13h();
+    // halt(0xffff, "Something has gone wrong");
+    // enterMode13h();
     term_print("This is ", 0x07);
     term_print(binfo.name, 0x0f);
     term_print(" version ", 0x07);
@@ -46,7 +47,7 @@ extern "C" void kernel_main(void)
         if(a == 0x07) { term_putc('\n', 0x07); }
     }
     term_print("\n", 0x07);
-    enterMode13h();
+    // enterMode12h();
     // font512();
     draw_x();
     prompt();

@@ -1,6 +1,6 @@
-#include "./headers/types.h"
-#include "./headers/util.h"
-#include "./headers/display.h"
+#include "headers/types.h"
+#include "headers/util.h"
+#include "headers/display.h"
 #define PIC1 0x20
 #define PIC2 0xa0
 #define ICW1 0x11
@@ -19,7 +19,6 @@ extern "C"
 	void setDL(unsigned char _val) { asm volatile ("movb %0, %%dl" : "=a" (_val)); }
 	void setDH(unsigned char _val) { asm volatile ("movb %0, %%dh" : "=a" (_val)); }
 	void setDX(unsigned short _val) { asm volatile ("movw %0, %%dx" : "=a" (_val)); }
-
 
 	int strcmp(const char * l, const char * r) {
 		for (; *l == *r && *l; l++, r++);
@@ -132,28 +131,28 @@ extern "C"
  	void halt(u16 code, char* message)
  	{
  		term_putc('\n', 0x07);
- 		term_print("System halted! Code: ", 0x3f);
- 		term_printnum(code, 0x3f);
+ 		term_print("System halted! Code: 0x", 0x3f);
+ 		term_printhex(code, 0x3f);
  		term_print(" (", 0x3f);
  		term_print(message, 0x3f);
  		term_print(")\n", 0x3f);
-		term_print("ax: ", 0x3f);
-		term_printnum(ax(), 0x3f);
-		term_print("; bx: ", 0x3f);
-		term_printnum(bx(), 0x3f);
-		term_print("; cx: ", 0x3f);
-		term_printnum(cx(), 0x3f);
-		term_print("; dx: ", 0x3f);
-		term_printnum(dx(), 0x3f);
-		term_print("; si: ", 0x3f);
-		term_printnum(si(), 0x3f);
-		term_print("; bp: ", 0x3f);
-		term_printnum(bp(), 0x3f);
-		term_print(" sp: ", 0x3f);
-		term_printnum(sp(), 0x3f);
-		term_print("; di: ", 0x3f);
-		term_printnum(di(), 0x3f);
-		
+		term_print("ax: 0x", 0x3f);
+		term_printhex(ax(), 0x3f);
+		term_print("; bx: 0x", 0x3f);
+		term_printhex(bx(), 0x3f);
+		term_print("; cx: 0x", 0x3f);
+		term_printhex(cx(), 0x3f);
+		term_print("; dx: 0x", 0x3f);
+		term_printhex(dx(), 0x3f);
+		term_print(";\nsi: 0x", 0x3f);
+		term_printhex(si(), 0x3f);
+		term_print("; bp: 0x", 0x3f);
+		term_printhex(bp(), 0x3f);
+		term_print("; sp: 0x", 0x3f);
+		term_printhex(sp(), 0x3f);
+		term_print("; di: 0x", 0x3f);
+		term_printhex(di(), 0x3f);
+		term_print(";\nIf you think this was an error on system's part, please, feel free to create an issue on Git repository.", 0x3f);
  		__asm__("hlt");
 	}
 }
