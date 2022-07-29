@@ -48,7 +48,8 @@ extern void setCX(unsigned short);
 extern void setDL(unsigned char);
 extern void setDH(unsigned char);
 extern void setDX(unsigned short);
-extern void halt(uint16_t, char*);
+extern void death(void);
+extern void halt(uint16_t, const char*);
 /* void * memcpy(void * restrict dest, const void * restrict src, long n); */
 extern void * memset(void * dest, int c, long n);
 extern int strcmp(const char * l, const char * r);

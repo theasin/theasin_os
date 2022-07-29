@@ -1,6 +1,7 @@
 #include "headers/types.h"
 #include "headers/util.h"
 #include "headers/display.h"
+#include <cpuid.h>
 #define PIC1 0x20
 #define PIC2 0xa0
 #define ICW1 0x11
@@ -128,31 +129,66 @@ extern "C"
 		asm("movw %%di,%0" : "=a"(result));
 		return result;
 	}
- 	void halt(u16 code, char* message)
- 	{
- 		term_putc('\n', 0x07);
- 		term_print("System halted! Code: 0x", 0x3f);
- 		term_printhex(code, 0x3f);
- 		term_print(" (", 0x3f);
- 		term_print(message, 0x3f);
- 		term_print(")\n", 0x3f);
-		term_print("ax: 0x", 0x3f);
-		term_printhex(ax(), 0x3f);
-		term_print("; bx: 0x", 0x3f);
-		term_printhex(bx(), 0x3f);
-		term_print("; cx: 0x", 0x3f);
-		term_printhex(cx(), 0x3f);
-		term_print("; dx: 0x", 0x3f);
-		term_printhex(dx(), 0x3f);
-		term_print(";\nsi: 0x", 0x3f);
-		term_printhex(si(), 0x3f);
-		term_print("; bp: 0x", 0x3f);
-		term_printhex(bp(), 0x3f);
-		term_print("; sp: 0x", 0x3f);
-		term_printhex(sp(), 0x3f);
-		term_print("; di: 0x", 0x3f);
-		term_printhex(di(), 0x3f);
-		term_print(";\nIf you think this was an error on system's part, please, feel free to create an issue on Git repository.", 0x3f);
+
+ 	void death()
+	{
+		font512();
+		term_row, term_col = 0;
+		enable_cursor(0, 0);
+		update_cursor(81, 61);
+		for(int x = 0; x <= 80; x++)
+			for(int y = 0; y <= 60; y++)
+				term_putc('\0', 0x40);
+		term_row = 0;
+		term_col = 0;
+ 		term_print("\n*** HALT! 0x????", 0x40);
+ 		term_print("\nThe system has been killed because of [UNKNOWN]\n\n", 0x40);
+		char * c = (char*)0xf0500;
+		for (u16 a = 0; a < 80 * 18; a++) term_puti((int)*(c + a), 0x40);
+ 		__asm__("hlt");
+	}
+
+ 	void halt(u16 code, const char* message)
+	{ 	
+		u16 a = ax();
+		u16 b = bx();
+		u16 c = cx(); 
+		u16 d = dx();
+		u16 s = si();
+		u16 d2 = di();
+		u16 b2 = bp();
+		u16 s2 = sp();
+		font512();  
+		term_row, term_col = 0;
+		enable_cursor(0, 0);
+		update_cursor(81, 61);
+		for(int x = 0; x <= 80; x++)
+			for(int y = 0; y <= 60; y++)
+				term_putc('\0', 0x1f);
+		term_row = 0;
+		term_col = 0;
+ 		term_print("\n*** HALT! 0x", 0x1f);
+ 		term_printhex(code, 0x1f);
+ 		term_print(" ", 0x1f);
+		term_print("(0x", 0x1f);
+		term_printhex(a, 0x1f);
+		term_print(",0x", 0x1f);
+		term_printhex(b, 0x1f);
+		term_print(",0x", 0x1f);
+		term_printhex(c, 0x1f);
+		term_print(",0x", 0x1f);
+		term_printhex(d, 0x1f);
+		term_print(",0x", 0x1f);
+		term_printhex(s, 0x1f);
+		term_print(",0x", 0x1f);
+		term_printhex(b2, 0x1f);
+		term_print(",0x", 0x1f);
+		term_printhex(s2, 0x1f);
+		term_print(",0x", 0x1f);
+		term_printhex(d2, 0x1f);
+		term_print(")\n", 0x1f);
+ 		term_print(message, 0x1f);
+		term_print("\n\n      #:::::-=***==----+--::..:::::-+=    \n      %::-+***+=-:......::-==+=:.::::+=   \n     :++++:...........        .-=-::::*:  \n     :-  ..............          .+=:::*  \n   .-    ...............           +=.:+. \n  .-       .........==.             +:.=. \n .-                 :@*:...    .+:  .+-=. \n =        .#:.......:%=**=:.....:*    ...:\n.=       .:@%-......-%+=.-**-...:#.-.    -\n.+      ..-#=#=.....+*-*#- .=++-.#..+.   -\n +     ...=#=-+#=..-#:  -#*.   -+#*.-*:+*-\n -:    ...+*+#:.+*+#:     =*:--::-#*=%*-:.\n  +    ...+*.:#+. ..       =:+-..-#@@+:::.\n   =:  ...+@+. =#+.        :-. .+*=::-*+::\n    .:=:..+%@#. .:..      .  :++.      +%:\n      =-=*#=-+#+ =:.    :-::+*::      .#+-\n    :-    .   ++.       :+#++#+.  .-+++-:-\n   ::.:=   . .-=-:::-==+=:...-+#=:::      \n       .:=...:      .:  .-=++:            \n   ..             ...:--..                \n", 0x1f);
  		__asm__("hlt");
 	}
 }

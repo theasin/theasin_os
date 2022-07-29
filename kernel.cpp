@@ -8,6 +8,7 @@
 #include "headers/asm.h"
 #include "headers/math.h"
 #include "headers/shell.h"
+#include "headers/util.h"
 
 #define INT_DISABLE 0
 #define INT_ENABLE 0x200
@@ -19,7 +20,6 @@
 #endif
 
 bool isPrompt = true;
-bool ctrl, alt, super, shift, caps = false;
 
 class BuildInfo {
     public:
@@ -29,27 +29,21 @@ class BuildInfo {
 
 extern "C" void kernel_main(void)
 {
-    BuildInfo binfo;
-    binfo.name = "THOS";
-    binfo.version = "prealpha-halt";
     term_init();
+	term_print("init: terminal initialized\n", 0x07);
+	font512();
+	term_print("init: font updated\n", 0x07);
     // halt(0xffff, "Something has gone wrong");
     // enterMode13h();
-    term_print("This is ", 0x07);
-    term_print(binfo.name, 0x0f);
-    term_print(" version ", 0x07);
-    term_print(binfo.version, 0x0f);
-    term_print("\n", 0x0f);
     enable_cursor(13, 16);
-    for(uint8_t a = 0x00; a<=0x0f; a = a + 0x01){
-        term_puti(0xdb, a);
-        term_puti(0xdb, a);
-        if(a == 0x07) { term_putc('\n', 0x07); }
-    }
-    term_print("\n", 0x07);
-    // enterMode12h();
-    // font512();
-    draw_x();
+	term_print("init: enabled cursor\n", 0x07);
+    // enterMode13h();
+	// draw_x();
+	term_print("init: ready\n", 0x07);
+    term_print("\nWelcome to TheasIN_OS!\n", 0x0f);
+    term_print("\nFor info on this release, enter ", 0x07);
+    term_print("release-info", 0x0f);
+    term_print(" command.\n", 0x07);
     prompt();
 }
 
