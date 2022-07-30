@@ -1,5 +1,8 @@
 #!/bin/bash
 pkill qemu-system-i386
+if [ ! -d ./tmp ]; then
+  mkdir -p ./tmp;
+fi
 i686-elf-gcc -std=gnu2x -ffreestanding -g -c start.s -o ./tmp/start.o --verbose
 i686-elf-gcc -std=gnu++20 -ffreestanding -g -c kernel.cpp -o ./tmp/kernel.o   -fno-exceptions -fno-rtti -Wfatal-errors
 i686-elf-gcc -std=gnu++20 -ffreestanding -g -c kbd.cpp -o ./tmp/kbd.o   -fno-exceptions -fno-rtti -Wfatal-errors
