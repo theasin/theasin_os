@@ -1,0 +1,11 @@
+*.json
+*.cfg
+*.py
+*.iso
+*.o
+*.gif
+*.png
+*.elf
+*.out
+*.sunvox*
+* copy.*
