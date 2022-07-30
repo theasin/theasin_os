@@ -40,7 +40,7 @@ extern "C"
         while (true)
         {
             char a = getCh();
-            term_putc(a, 0x0b);
+            if (a == 's' || a == 'h' || a == 'c') term_putc(a, 0x0b);
             if(a == 's')
             {
                 term_print("\nACPI support not yet implemented!\n", 0x0b);
@@ -68,6 +68,7 @@ extern "C"
         else if(!strcmp(cmd, "2plus2")) { term_print("...is equal to 5", 0x0f); }
         else if(!strcmp(cmd, "crimea")) { term_print("...is Russian", 0x0f); }
         else if(!strcmp(cmd, "menu")) { actionMenu(); }
+        else if(!strcmp(cmd, "")) {  }
         else { term_print("unknown cmd: ", 0x04); term_print(cmd, 0x04); }
         prompt();
     }

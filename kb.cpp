@@ -325,13 +325,11 @@ extern "C"
             if(getKb(sc) == '\b') { 
             if(cmdPos > 0)
             {
-                cmd[cmdPos--] = '\0'; 
-            } else if(cmdPos == 0) {
-                cmd[0] = '\0';
+                cmd[--cmdPos] = '\0'; 
             }
             }
             if(getKb(sc) == '\n') {  
-                cmd[++cmdPos] = '\0';
+                cmd[cmdPos] = '\0';
                 ret = &(cmd[0]);
                 break;
             }
