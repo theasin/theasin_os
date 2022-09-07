@@ -1,4 +1,4 @@
 # os
-Операционная система, написанная на Си++
-
-На данный момент код находится только в ветках `unstable` и `duct-tape*`
+An OS written in C/C++ programming language
+The code is in `unstable` and `duct-tape*` branches
+Please note, that most commits are in Russian
