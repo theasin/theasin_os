@@ -325,7 +325,7 @@ extern "C"
             if(getKb(sc) == '\b') { 
             if(cmdPos > 0)
             {
-                cmd[--cmdPos] = '\0'; 
+                cmd[cmdPos--] = ' '; 
             }
             }
             if(getKb(sc) == '\n') {  

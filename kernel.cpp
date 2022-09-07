@@ -44,6 +44,7 @@ extern "C" void kernel_main(void)
     term_print("\nFor info on this release, enter ", 0x07);
     term_print("release-info", 0x0f);
     term_print(" command.\n", 0x07);
+    // term_print("\nWARNING! You are running an UNREGISTERED version of TheasIN_OS\n", 0x0c);
     prompt();
 }
 

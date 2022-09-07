@@ -1095,7 +1095,7 @@ extern "C" {
                 term_col += 4;
                 break;
             case '\b':
-                if(term_col > 0)
+                if(term_col > 0 && (buf[(VGA_COLS * term_row) + term_col - 1]) != 0x01)
                 {
                     term_col--;
                     term_putc('\0', 0x0f);
@@ -1113,10 +1113,10 @@ extern "C" {
                 term_row++;
                 break;
             }
-            case '\e':
+            case '\x01':
             {
-                buf[(VGA_COLS * term_row) + term_col] = '\e';
-                vga_buffer[(VGA_COLS * term_row) + term_col] = ((u16)0x02 << 8) | ' ';
+                buf[(VGA_COLS * term_row) + term_col] = '\x01';
+                vga_buffer[(VGA_COLS * term_row) + term_col] = ((u16)0x00 << 8) | ' ';
                 term_col++;
                 break;
             }
