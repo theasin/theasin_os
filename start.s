@@ -26,7 +26,7 @@ _start:
 	mov $0x13, %al
 	
 	mov $stack_top, %esp
-	call kernel_main
+	call init
 	cli
 1:	hlt
 	jmp 1b

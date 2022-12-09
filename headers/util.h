@@ -1,4 +1,8 @@
+/**
+* @attention Some code used in this file is from https://github.com/klange/toaruos which is distributed under the NCSA license, and might have been modified for compatability.
+**/
 #pragma once
+#include "types.h"
 #ifndef UTIL_H
 #define UTIL_H
 extern "C" {
@@ -50,6 +54,7 @@ extern void setDH(unsigned char);
 extern void setDX(unsigned short);
 extern void death(void);
 extern void halt(uint16_t, const char*);
+extern void phalt();
 /* void * memcpy(void * restrict dest, const void * restrict src, long n); */
 extern void * memset(void * dest, int c, long n);
 extern int strcmp(const char * l, const char * r);
@@ -67,6 +72,17 @@ extern u16 si();
 extern u16 bp();
 extern u16 sp();
 extern u16 di();
+
+extern char *strtok(char *src, char *delim); // strtok implementation stolen from https://aticleworld.com/implement-strtok-function-in-c/
+extern int atoi(char *str); // atoi implementation taken from https://www.geeksforgeeks.org/write-your-own-atoi/
+extern int htoi(char *str);
+// extern u32 taskNum;
+// struct __task {
+//     public:
+//         char * taskID;
+//         u32 taskAddr;
+// };
+// extern struct __task __tasks[0xffff];
 
 #define DATA_LOAD_BASE 0x4000000
 }

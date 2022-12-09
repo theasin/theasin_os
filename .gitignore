@@ -1,5 +1,4 @@
 *.json
-*.cfg
 *.py
 *.iso
 *.o
@@ -9,3 +8,4 @@
 *.out
 *.sunvox*
 * copy.*
+*.tmp

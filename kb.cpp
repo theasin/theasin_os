@@ -76,7 +76,7 @@ extern "C"
                 else if(!ctrl)
 					return 'D';
 				if(ctrl)
-					halt(0x0000, "SESSION_EOF_NO_ACPI");
+					phalt();
 	            break;
 			}
             case 0x12:

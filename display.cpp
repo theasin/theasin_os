@@ -1474,6 +1474,18 @@ extern "C" {
                 }
             }
             getCh();
+            for(y = 0; y < g_ht; y++)
+            {
+                for(x = 0; x < g_wd; x++)
+                {
+                    i16 vx = x - (g_wd / 2);
+                    i16 vy = y - (g_ht / 2);
+                    // g_write_pixel(x, y, ((x - (g_wd / 2)) * (y - (g_ht / 2))));
+                    g_write_pixel(x, y, vx >> vy);
+                    a++;
+                }
+            }
+            getCh();
         }
     }
 
