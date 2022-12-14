@@ -1,5 +1,6 @@
-/* New keyboard scancodes */
-/* Totally not stolen from klange/toaruos */
+/**
+* @attention Some code used in this file is from https://github.com/klange/toaruos which is distributed under the NCSA license, and might have been modified for compatability.
+**/
 #pragma once
 
 #ifndef KBD_H
