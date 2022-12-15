@@ -6,6 +6,9 @@
 #ifndef UTIL_H
 #define UTIL_H
 extern "C" {
+
+extern u32p mbootAddr;
+
 static inline unsigned short ins(unsigned short _port) {
 	unsigned short rv;
 	asm volatile ("inw %1, %0" : "=a" (rv) : "dN" (_port));
@@ -72,6 +75,18 @@ extern u16 si();
 extern u16 bp();
 extern u16 sp();
 extern u16 di();
+
+extern u32 ebx();
+extern u32 eax();
+extern u32 ecx();
+extern u32 edx();
+extern u32 esi();
+extern u32 ebp();
+extern u32 esp();
+extern u32 edi();
+
+extern u32 ebpp();
+extern u32 espp();
 
 extern char *strtok(char *src, char *delim); // strtok implementation stolen from https://aticleworld.com/implement-strtok-function-in-c/
 extern int atoi(char *str); // atoi implementation taken from https://www.geeksforgeeks.org/write-your-own-atoi/

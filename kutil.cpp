@@ -11,6 +11,7 @@
 #define ICW4 0x01
 extern "C" 
 {
+	u32p mbootAddr;
 	void setAL(unsigned char _val) { asm volatile ("movb %0, %%al" : "=a" (_val)); }
 	void setAH(unsigned char _val) { asm volatile ("movb %0, %%ah" : "=a" (_val)); }
 	void setAX(unsigned short _val) { asm volatile ("movw %0, %%ax" : "=a" (_val)); }
@@ -254,6 +255,69 @@ extern "C"
 		return result;
 	}
 
+	u32 eax()
+	{
+		u32 result;
+		asm("movl %%eax,%0" : "=r"(result));
+		return result;
+	}
+	u32 ebx()
+	{
+		u32 result;
+		asm("movl %%ebx,%0" : "=r"(result));
+		return result;
+	}
+	u32 ecx()
+	{
+		u32 result;
+		asm("movl %%ecx,%0" : "=r"(result));
+		return result;
+	}
+	u32 edx()
+	{
+		u32 result;
+		asm("movl %%edx,%0" : "=r"(result));
+		return result;
+	}
+	u32 esi()
+	{
+		u32 result;
+		asm("movl %%esi,%0" : "=r"(result));
+		return result;
+	}
+	u32 ebp()
+	{
+		u32 result;
+		asm("movl %%ebp,%0" : "=r"(result));
+		return result;
+	}
+	u32 esp()
+	{
+		u32 result;
+		asm("movl %%esp,%0" : "=r"(result));
+		return result;
+	}
+	
+	u32 edi()
+	{
+		u32 result;
+		asm("movl %%edi,%0" : "=r"(result));
+		return result;
+	}
+
+	u32 ebpp()
+	{
+		u32 result;
+		asm("movl (%%ebp),%0" : "=r"(result));
+		return result;
+	}
+	u32 espp()
+	{
+		u32 result;
+		asm("movl (%%esp),%0" : "=r"(result));
+		return result;
+	}
+
  	void death()
 	{
 		font512();
@@ -281,13 +345,9 @@ extern "C"
 		u16 d2 = di();
 		u16 b2 = bp();
 		u16 s2 = sp();
-		font512();  
+		// font512();  
 		term_row, term_col = 0;
-		enable_cursor(0, 0);
-		update_cursor(81, 61);
-		for(int x = 0; x <= 80; x++)
-			for(int y = 0; y <= 60; y++)
-				term_putc('\0', 0x1f);
+		term_fill(0x11);
 		term_row = 0;
 		term_col = 0;
  		term_print("\n*** HALT! ", 0x1f);

@@ -11,3 +11,4 @@
 #include "shell.h"
 #include "util.h"
 #include "release-info.h"
+#include "sound.h"

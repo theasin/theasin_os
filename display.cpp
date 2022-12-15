@@ -37,15 +37,40 @@ void * memcpy (void *dest, const void *src, size_t len)
 #define	VGA_NUM_GC_REGS		9
 #define	VGA_NUM_AC_REGS		21
 #define	VGA_NUM_REGS		(1 + VGA_NUM_SEQ_REGS + VGA_NUM_CRTC_REGS + VGA_NUM_GC_REGS + VGA_NUM_AC_REGS)
+#define PSF_FONT_MAGIC 0x864ab572
+ 
+
 extern "C" {
+
+    typedef struct {
+        uint32_t magic;         /* magic bytes to identify PSF */
+        uint32_t version;       /* zero */
+        uint32_t headersize;    /* offset of bitmaps in file, 32 */
+        uint32_t flags;         /* 0 if there's no unicode table */
+        uint32_t numglyph;      /* number of glyphs */
+        uint32_t bytesperglyph; /* size of each glyph */
+        uint32_t height;        /* height in pixels */
+        uint32_t width;         /* width in pixels */
+    } PSF_font;
+
+    extern char _binary_font_psf_start;
+    extern char _binary_font_psf_end;
+ 
     char buf[80 * 25];
     const char g_HexChars[] = "0123456789ABCDEF";
     volatile u16p vga_buffer = (u16p)0xb8000; //beginning address of vga textbuffer
-    const int VGA_COLS = 80;
-    const int VGA_ROWS = 25;
+    const int VGA_COLS = 128;
+    const int VGA_ROWS = 48;
     u8 term_col = 0;
     u8 term_row = 0;
     u8 defcol = 0x07;
+    // int g_wd = *((u32p)(*mbootAddr + 0x64));
+    // int g_ht = *((u32p)(*mbootAddr + 0x68));
+    int g_wd = 1024;
+    int g_ht = 768;
+    u16 res_x = 1024;
+    u16 res_y = 768;
+    u16 bpp = 32;
     bool rtlo, insanity = false;
     unsigned char g_40x25_text[] =
     {
@@ -1054,7 +1079,45 @@ extern "C" {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     }; */
 
-
+    u32 vga_color(u8 cl) {
+        switch(cl)
+        {
+            case 0:
+                return 0;
+            case 1:
+                return 0x00007f;
+            case 2:
+                return 0x007f00;
+            case 3:
+                return 0x007f7f;
+            case 4:
+                return 0x7f0000;
+            case 5:
+                return 0x7f007f;
+            case 6:
+                return 0x914400;
+            case 7:
+                return 0x7f7f7f;
+            case 8:
+                return 0x222222;
+            case 9:
+                return 0x0000ff;
+            case 10:
+                return 0x00ff00;
+            case 11:
+                return 0x00ffff;
+            case 12:
+                return 0xff0000;
+            case 13:
+                return 0xff00ff;
+            case 14:
+                return 0xffff00;
+            case 15:
+                return 0xffffff;
+            default:
+                return 0x7f7f7f;
+        }
+    }
 
     str tochar(u64 i, char *p)
     {
@@ -1077,15 +1140,78 @@ extern "C" {
         {
             for (int row = 0; row < VGA_ROWS; row++)
             {
-                const size_t index = (VGA_COLS * row) + col;
-                vga_buffer[index] = ((u16)defcol << 8) | ' ';
-                buf[index] = 0;
-
+                vbe_putc(' ', col, row, 0, 0);
             }
         }
     }
 
-    void term_putc(const char c, u8 cl)
+    /* number of bytes in each line, it's possible it's not screen width * bytesperpixel! */
+    int scanline = 1024 * 4;
+    /* import our font that's in the object file we've created above */
+    
+    #define PIXEL uint32_t   /* pixel pointer */
+
+    void vbe_plot_pixel(u32 cl, u32 x, u32 y) {
+        int fb = *((u64p)((u32)mbootAddr + 0x58));
+        int pt = *((u32p)((u32)mbootAddr + 0x60));
+        *((u32p)(y * pt + (x * 4) + fb)) = cl;
+    }
+
+    void vbe_fill(u32 col) {
+        for (u16 y = 0; y < 768; y++)
+            for (u16 x = 0; x < 1024; x++)
+                vbe_plot_pixel(col, x, y);
+    }
+
+    void vbe_init() {
+        vbe_fill(0);
+    }
+
+    void vbe_putc(
+        /* note that this is int, not char as it's a unicode character */
+        char c,
+        /* cursor position on screen, in characters not in pixels */
+        int cx, int cy,
+        /* foreground and background colors, say 0xFFFFFF and 0x000000 */
+        uint32_t fg, uint32_t bg)
+    {
+        int frbuf = *((u64p)((u32)mbootAddr + 0x58));
+        int pitch = *((u32p)((u32)mbootAddr + 0x60));
+        /* cast the address to PSF header struct */
+        PSF_font *font = (PSF_font*)&_binary_font_psf_start;
+        /* we need to know how many bytes encode one row */
+        int bytesperline = 1;
+        /* get the glyph for the character. If there's no
+        glyph for a given character, we'll display the first glyph. */
+        unsigned char *glyph =
+            (unsigned char*)&_binary_font_psf_start + (c>=0&&c<255?c:0)*16 + 4;
+        /* calculate the upper left corner on screen where we want to display.
+        we only do this once, and adjust the offset later. This is faster. */
+        int offs =
+            (cy * 16 * scanline) +
+            (cx * (8 + 1) * 4);
+        /* finally display pixels according to the bitmap */
+        int x,y, line,mask;
+        // for(y=(cy * 16);y<16+(cy * 16);y++){
+        for(y=0;y<16;y++){
+        /* save the starting position of the line */
+        line=offs;
+        mask=1<<(8-1);
+        /* display a row */
+            // for(x=(cx * 8);x<8+(cy * 8)*3;x++){
+            for(x=0;x<8;x++){
+                vbe_plot_pixel(*((unsigned int*)glyph) & mask ? fg : bg, cx*8 + x, y + cy * 16);
+                /* adjust to the next pixel */
+                mask >>= 1;
+                line += 4;
+            }
+            /* adjust to the next line */
+            glyph += bytesperline;
+            offs  += scanline;
+        }
+    }
+
+    void term_putc_legacy(const char c, u8 cl)
     {
         switch(c)
         {   
@@ -1098,14 +1224,14 @@ extern "C" {
                 if(term_col > 0 && (buf[(VGA_COLS * term_row) + term_col - 1]) != 0x01)
                 {
                     term_col--;
-                    term_putc('\0', 0x0f);
+                    term_putc_legacy('\0', 0x0f);
                     term_col--;
                     break;
                 } else { break; }
             case '\r':
             {
-                const size_t r = (VGA_COLS * term_row) + term_col;
-                vga_buffer[r] = ((u16)term_row * term_col << 8) | 0xff;
+                // const size_t r = (VGA_COLS * term_row) + term_col;
+                // vga_buffer[r] = ((u16)term_row * term_col << 8) | 0xff;
             }
             case '\n':
             {
@@ -1116,14 +1242,14 @@ extern "C" {
             case '\x01':
             {
                 buf[(VGA_COLS * term_row) + term_col] = '\x01';
-                vga_buffer[(VGA_COLS * term_row) + term_col] = ((u16)0x00 << 8) | ' ';
+                // vga_buffer[(VGA_COLS * term_row) + term_col] = ((u16)0x00 << 8) | ' ';
                 term_col++;
                 break;
             }
             default:
             {
                 const size_t index = (VGA_COLS * term_row) + term_col;
-                vga_buffer[index] = ((u16)cl << 8) | c;
+                // vga_buffer[index] = ((u16)cl << 8) | c;
                 buf[index] = c;
                 term_col++; 
             }
@@ -1138,6 +1264,57 @@ extern "C" {
                 term_col = 0;
             }
         }
+    }
+
+    void term_putc(char c, u8 cl) {
+        switch(c)
+        {
+            case '\1':
+            {
+                buf[(VGA_COLS * term_row) + term_col] = '\1';
+                term_col++;
+                break;
+            }
+            case '\0': {
+                term_putc(' ', cl);
+            }
+            case '\v':
+                break;
+            case '\t':
+                term_col += 4;
+                break;
+            case '\b':
+                if(term_col > 0 && buf[(VGA_COLS * term_row) + term_col - 1] != 1)
+                {
+                    term_col--;
+                    term_putc(' ', cl);
+                    term_col--;
+                    break;
+                } else {         
+                    break;
+                }
+            case '\n':
+            {
+                term_col = 0;
+                term_row++;
+                break;
+            }
+            default: 
+            {
+                vbe_putc(c, term_col++, term_row, vga_color(cl & 0x0f), vga_color(cl >> 4 & 0xf));
+            }
+        }
+            if (term_col >= VGA_COLS)
+            {
+                term_col = 0;
+                term_row++;
+            }
+    }
+
+    void term_fill(u8 cl) {
+        for(u8 a = 0; a < VGA_COLS; a++)
+            for(u8 b = 0; b < VGA_ROWS; b++)
+                vbe_putc(' ', a, b, vga_color(cl & 0x0f), vga_color(cl >> 4 & 0xf));
     }
 
     void term_puti(u8 c, u8 cl)
@@ -1358,8 +1535,8 @@ extern "C" {
         outb(0x3D4, 0x0E);
         outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
     }
-    static void (*g_write_pixel)(unsigned x, unsigned y, unsigned c);
-    static unsigned g_wd, g_ht;
+    static void (*g_write_pixel)(long unsigned x, long unsigned y, long unsigned c);
+    // static unsigned g_wd, g_ht;
     static unsigned char reverse_bits(unsigned char arg)
     {
         unsigned char ret_val = 0;
@@ -1409,10 +1586,17 @@ extern "C" {
             pmask <<= 1;
         }
     }
+
+    void vbe_wr_pix(u32 x, u32 y, u32 cl) {
+        vbe_plot_pixel(cl, x, y);
+    }
+
     void draw_x(void)
     {
         unsigned x, y;
         u32 a = 0;
+        g_write_pixel = vbe_wr_pix;
+
         // /* clear screen */
         //     for(y = 0; y < g_ht; y++)
         //         for(x = 0; x < g_wd; x++)
@@ -1664,10 +1848,10 @@ so attribute bit b3 is no longer used for 'intense' */
 
     void enterMode13h(void)
     {
-        g_write_pixel = write_pixel8;
-        write_regs(g_320x200x256);
-	    g_wd = 320;
-	    g_ht = 200;
+        // g_write_pixel = write_pixel8;
+        // write_regs(g_320x200x256);
+	    // g_wd = 320;
+	    // g_ht = 200;
     }
 
     void enterMode(u8 m)
@@ -1677,14 +1861,15 @@ so attribute bit b3 is no longer used for 'intense' */
 
     void enterMode12h(void)
     {
-        g_write_pixel = write_pixel4p;
-        write_regs(g_640x480x16);
-	    g_wd = 640;
-	    g_ht = 480;
+        // g_write_pixel = write_pixel4p;
+        // write_regs(g_640x480x16);
+	    // g_wd = 640;
+	    // g_ht = 480;
     }
 
 	void enterModeText(void)
 	{
 		write_regs(g_80x25_text);
 	}
+
 }

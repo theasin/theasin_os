@@ -1,8 +1,5 @@
 #!/bin/bash
-if [ ! -d ./tmp ]; then
-  mkdir -p tmp;
-fi
-bash ./build.sh
+sh ./build.sh
 if [ ! -d ./isoroot/boot/grub ]; then
   mkdir -p isoroot/boot/grub;
 fi
