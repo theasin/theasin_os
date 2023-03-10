@@ -7,5 +7,5 @@ To build it you should have:
 * `i686-elf-gcc` and `i686-elf-binutils` (both can be installed from AUR)
 * `grub` and `xorriso` (making ISO images, cruical for testing)
 * `p7zip` (compression for final build)
---
+---
 **Code moved from my Gitea instance**
